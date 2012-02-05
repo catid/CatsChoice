@@ -39,7 +39,6 @@ using namespace std;
 	-- Candidate 0xfffd6389.  Factors = 3, 1431598723
 	-- Candidate 0xfffd21a7.  Factors = 3, 1431593101
 	-- Candidate 0xfffd1361.  Factors = 3, 1431591883
-	-- Candidate 0xfffc7635.  Factors = 3, 1431578471
 	...
 
 	So I guess that 3 is always a factor of A.
@@ -51,7 +50,7 @@ using namespace std;
 		A1 = 0xffffbe17, A2 = 0xffff4b9f
 		A1 = 0xffff0207, A2 = 0xfffe1495
 		A1 = 0xfffd8b79, A2 = 0xfffd6389
-		A1 = 0xfffd1361, A2 = 0xfffc7635
+		A1 = 0xfffd21a7, A2 = 0xfffd1361
 
 	In practice the generator is seeded using two numbers,
 	one is fixed and the other increments by 1 each time.
@@ -65,7 +64,7 @@ using namespace std;
 		A1 = 0xffffbe17, A2 = 0xffff4b9f
 		A1 = 0xffff0207, A2 = 0xfffe1495
 		A1 = 0xfffd8b79, A2 = 0xfffd6389
-		A1 = 0xfffd1361, A2 = 0xfffc7635
+		A1 = 0xfffd21a7, A2 = 0xfffd1361
 
 	Then I swapped which seed was held fixed and did it
 	again.  These are the pairs that passed both tests:
@@ -73,7 +72,7 @@ using namespace std;
 		A1 = 0xffffbe17, A2 = 0xffff4b9f
 		A1 = 0xffff0207, A2 = 0xfffe1495
 		A1 = 0xfffd8b79, A2 = 0xfffd6389
-		A1 = 0xfffd1361, A2 = 0xfffc7635
+		A1 = 0xfffd21a7, A2 = 0xfffd1361
 
 	It was a lot of work but I now have a very good and
 	fast generator that approximates a hash function and
@@ -89,6 +88,10 @@ using namespace std;
 
 	Its period is about 2^^126 and passes all BigCrush tests.
 	It is the fastest generator I could find that passes all tests.
+
+	Furthermore, the input seeds are hashed to avoid linear
+	relationships between the input seeds and the low bits of
+	the first few outputs.
 */
 class CAT_EXPORT CatsChoice
 {
