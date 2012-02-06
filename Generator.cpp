@@ -44,13 +44,12 @@ using namespace std;
 	So I guess that 3 is always a factor of A.
 
 	I then produced CatsChoice-like generators using pairs
-	of these A values and tested them with BigCrush.
-	These are the pairs that passed the test:
+	of these A values and tested them with BigCrush:
 
-		A1 = 0xffffbe17, A2 = 0xffff4b9f
-		A1 = 0xffff0207, A2 = 0xfffe1495
-		A1 = 0xfffd8b79, A2 = 0xfffd6389
-		A1 = 0xfffd21a7, A2 = 0xfffd1361
+		A1 = 0xffffbe17, A2 = 0xffff4b9f <- Failed test 48
+		A1 = 0xffff0207, A2 = 0xfffe1495 <- Passed all tests
+		A1 = 0xfffd8b79, A2 = 0xfffd6389 <- Passed all tests
+		A1 = 0xfffd21a7, A2 = 0xfffd1361 <- Passed all tests
 
 	In practice the generator is seeded using two numbers,
 	one is fixed and the other increments by 1 each time.
@@ -61,7 +60,6 @@ using namespace std;
 	counter for the other seed.  These are the pairs that
 	passed this stringent test:
 
-		A1 = 0xffffbe17, A2 = 0xffff4b9f
 		A1 = 0xffff0207, A2 = 0xfffe1495
 		A1 = 0xfffd8b79, A2 = 0xfffd6389
 		A1 = 0xfffd21a7, A2 = 0xfffd1361
@@ -69,7 +67,6 @@ using namespace std;
 	Then I swapped which seed was held fixed and did it
 	again.  These are the pairs that passed both tests:
 
-		A1 = 0xffffbe17, A2 = 0xffff4b9f
 		A1 = 0xffff0207, A2 = 0xfffe1495
 		A1 = 0xfffd8b79, A2 = 0xfffd6389
 		A1 = 0xfffd21a7, A2 = 0xfffd1361

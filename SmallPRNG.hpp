@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011 Christopher A. Taylor.  All rights reserved.
+	Copyright (c) 2012 Christopher A. Taylor.  All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are :
@@ -897,30 +897,22 @@ class CAT_EXPORT CatsChoice
 {
 	u64 _x, _y;
 
-public:
-	CAT_INLINE void Initialize(u32 seed_x, u32 seed_y)
+	CAT_INLINE u64 fmix64(u64 k)
 	{
-		// Based on the final mixing function of MurmurHash3
-		static const u64 MURMUR_FMIX_K1 = 0xff51afd7ed558ccdULL;
-		static const u64 MURMUR_FMIX_K2 = 0xc4ceb9fe1a85ec53ULL;
+		// Based on the mixing functions of MurmurHash3
+		k ^= k >> 33;
+		k *= 0xff51afd7ed558ccdULL;
+		k ^= k >> 33;
+		k *= 0xc4ceb9fe1a85ec53ULL;
+		k ^= k >> 33;
+	}
 
-		// Mix bits of seed x
-		u64 x = 0x9368e53c2f6af274ULL ^ seed_x;
-		x ^= x >> 33;
-		x *= MURMUR_FMIX_K1;
-		x ^= x >> 33;
-		x *= MURMUR_FMIX_K2;
-		x ^= x >> 33;
-		_x = x;
-
-		// Mix bits of seed y
-		u64 y = 0x586dcd208f7cd3fdULL ^ seed_y;
-		y ^= y >> 33;
-		y *= MURMUR_FMIX_K1;
-		y ^= y >> 33;
-		y *= MURMUR_FMIX_K2;
-		y ^= y >> 33;
-		_y = y;
+public:
+	CAT_INLINE void Initialize(u32 x, u32 y)
+	{
+		_x = fmix64(0x9368e53c2f6af274ULL ^ x);
+		_y = fmix64(0x586dcd208f7cd3fdULL ^ y);
+		Next();
 	}
 
 	CAT_INLINE void Initialize(u32 seed)
