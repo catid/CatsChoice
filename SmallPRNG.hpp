@@ -897,22 +897,35 @@ class CAT_EXPORT CatsChoice
 {
 	u64 _x, _y;
 
-	CAT_INLINE u64 fmix64(u64 k)
-	{
-		// Based on the mixing functions of MurmurHash3
-		k ^= k >> 33;
-		k *= 0xff51afd7ed558ccdULL;
-		k ^= k >> 33;
-		k *= 0xc4ceb9fe1a85ec53ULL;
-		k ^= k >> 33;
-	}
-
 public:
 	CAT_INLINE void Initialize(u32 x, u32 y)
 	{
-		_x = fmix64(0x9368e53c2f6af274ULL ^ x);
-		_y = fmix64(0x586dcd208f7cd3fdULL ^ y);
-		Next();
+		// Based on the mixing functions of MurmurHash3
+		static const u64 C1 = 0xff51afd7ed558ccdULL;
+		static const u64 C2 = 0xc4ceb9fe1a85ec53ULL;
+		static const u64 C3 = 0x87c37b91114253d5ULL;
+		static const u64 C4 = 0x4cf5ad432745937fULL;
+
+		u64 seed_x = 0x9368e53c2f6af274ULL ^ x;
+		u64 seed_y = 0x586dcd208f7cd3fdULL ^ y;
+
+		seed_x *= C1;
+		seed_x = CAT_ROL64(seed_x, 31);
+
+		seed_y *= C2;
+		seed_y = CAT_ROL64(seed_y, 33);
+
+		seed_x += seed_y;
+		seed_y += seed_x;
+
+		seed_x *= C3;
+		seed_x = CAT_ROL64(seed_x, 27);
+
+		seed_y *= C4;
+		seed_y = CAT_ROL64(seed_y, 31);
+
+		_x = seed_x;
+		_y = seed_y;
 	}
 
 	CAT_INLINE void Initialize(u32 seed)
