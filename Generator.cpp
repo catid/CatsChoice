@@ -57,6 +57,11 @@ using namespace std;
 	be "good enough" for casual use though.  The long run
 	of the PRNG passes the tests, so no big deal.
 
+	I considered removing the Next(); call from Initialize(),
+	but found that it actually does noticeably help with the
+	uniformity of the first output of the generator in some
+	informal tests I performed, so kept it in.
+
 	Say hello to the new CatsChoice PRNG:
 */
 
