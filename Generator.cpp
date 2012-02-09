@@ -41,39 +41,21 @@ using namespace std;
 	-- Candidate 0xfffd1361.  Factors = 3, 1431591883
 	...
 
-	So I guess that 3 is always a factor of A.
-
+	So I guess that 3 is always a factor of A...
 	I then produced CatsChoice-like generators using pairs
 	of these A values and tested them with BigCrush:
 
 		A1 = 0xffffbe17, A2 = 0xffff4b9f <- Failed test 48
 		A1 = 0xffff0207, A2 = 0xfffe1495 <- Passed all tests
 		A1 = 0xfffd8b79, A2 = 0xfffd6389 <- Passed all tests
-		A1 = 0xfffd21a7, A2 = 0xfffd1361 <- Passed all tests
+		A1 = 0xfffd21a7, A2 = 0xfffd1361 <- Passed all tests (chosen)
 
-	In practice the generator is seeded using two numbers,
-	one is fixed and the other increments by 1 each time.
-	So the actual generator usage is very different from
-	the steady state after seeding.  I then retested the
-	above generators with BigCrush by fixing one of the
-	seeds = 0 and producing output by incrementing a
-	counter for the other seed.  These are the pairs that
-	passed this stringent test:
-
-		A1 = 0xffff0207, A2 = 0xfffe1495
-		A1 = 0xfffd8b79, A2 = 0xfffd6389
-		A1 = 0xfffd21a7, A2 = 0xfffd1361
-
-	Then I swapped which seed was held fixed and did it
-	again.  These are the pairs that passed both tests:
-
-		A1 = 0xffff0207, A2 = 0xfffe1495
-		A1 = 0xfffd8b79, A2 = 0xfffd6389
-		A1 = 0xfffd21a7, A2 = 0xfffd1361
-
-	It was a lot of work but I now have a very good and
-	fast generator that approximates a hash function and
-	can take 32-bit (x,y) coordinate input.
+	I borrowed the best fast mixing function I could find
+	to do the seeding.  The seeding doesn't seem to pass the
+	BigCrush tests so it might still be improved.  Using a
+	few simple tests I came up with on the spot it seems to
+	be "good enough" for casual use though.  The long run
+	of the PRNG passes the tests, so no big deal.
 
 	Say hello to the new CatsChoice PRNG:
 */
@@ -95,29 +77,32 @@ class CAT_EXPORT CatsChoice
 	u64 _x, _y;
 
 public:
-	CAT_INLINE void Initialize(u32 seed_x, u32 seed_y)
+	CAT_INLINE void Initialize(u32 x, u32 y)
 	{
-		// Based on the final mixing function of MurmurHash3
-		static const u64 MURMUR_FMIX_K1 = 0xff51afd7ed558ccdULL;
-		static const u64 MURMUR_FMIX_K2 = 0xc4ceb9fe1a85ec53ULL;
+		// Based on the mixing functions of MurmurHash3
+		static const u64 C1 = 0xff51afd7ed558ccdULL;
+		static const u64 C2 = 0xc4ceb9fe1a85ec53ULL;
 
-		// Mix bits of seed x
-		u64 x = 0x9368e53c2f6af274ULL ^ seed_x;
-		x ^= x >> 33;
-		x *= MURMUR_FMIX_K1;
-		x ^= x >> 33;
-		x *= MURMUR_FMIX_K2;
-		x ^= x >> 33;
-		_x = x;
+		x += y;
+		y += x;
 
-		// Mix bits of seed y
-		u64 y = 0x586dcd208f7cd3fdULL ^ seed_y;
-		y ^= y >> 33;
-		y *= MURMUR_FMIX_K1;
-		y ^= y >> 33;
-		y *= MURMUR_FMIX_K2;
-		y ^= y >> 33;
-		_y = y;
+		u64 seed_x = 0x9368e53c2f6af274ULL ^ x;
+		u64 seed_y = 0x586dcd208f7cd3fdULL ^ y;
+
+		seed_x *= C1;
+		seed_x ^= seed_x >> 33;
+		seed_x *= C2;
+		seed_x ^= seed_x >> 33;
+
+		seed_y *= C1;
+		seed_y ^= seed_y >> 33;
+		seed_y *= C2;
+		seed_y ^= seed_y >> 33;
+
+		_x = seed_x;
+		_y = seed_y;
+
+		Next();
 	}
 
 	CAT_INLINE void Initialize(u32 seed)
@@ -127,12 +112,11 @@ public:
 
 	CAT_INLINE u32 Next()
 	{
-		_x = (u64)0xffff0207 * (u32)_x + (u32)(_x >> 32);
-		_y = (u64)0xffff4b9f * (u32)_y + (u32)(_y >> 32);
+		_x = (u64)0xfffd21a7 * (u32)_x + (u32)(_x >> 32);
+		_y = (u64)0xfffd1361 * (u32)_y + (u32)(_y >> 32);
 		return (u32)_x + (u32)_y;
 	}
 };
-
 
 
 static const u16 PRIME_LIST[] = {
@@ -314,14 +298,14 @@ int main()
 {
 	CatsChoice prng;
 	prng.Initialize(0);
-
+/*
 	for (int ii = 1; ii; ++ii)
 	{
 		prng.Initialize(ii, 0);
 
 		cout << (prng.Next() & 1) << endl;
 	}
-
+*/
 	// Find values that work
 	for (u32 a = 0xffffffff; a; a -= 2)
 	{
